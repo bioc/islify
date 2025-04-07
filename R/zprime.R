@@ -18,6 +18,7 @@
 #' controls. 
 #' @param method A character vector, indicating which method should be used to
 #' compute the Z'-factor. Default is mahalanobis. See details.
+#' @value The z-prime value for the data in question.
 #' @references J. H. Zhang, T. D. Chung, K. R. Oldenburg. A Simple
 #' Statistical Parameter for Use in Evaluation and Validation of High
 #' Throughput Screening Assays. J Biomol Screening, 1999.
@@ -48,15 +49,16 @@
 #' 
 #' zprime(a, b)
 #' @export zprime
-zprime = function(a, b, method=c('mahalanobis', 'robust', 'fixsd', 'original')) {
-    method = match.arg(method)
+zprime <- function(a, b, 
+                  method=c('mahalanobis', 'robust', 'fixsd', 'original')) {
+    method <- match.arg(method)
     
-    if (method=='mahalanobis') {
+    if (method == 'mahalanobis') {
         if (is.null(dim(a))) a = matrix(a, ncol = 1)
         if (is.null(dim(b))) b = matrix(b, ncol = 1)
-        mua = apply(a, 2, mean)
-        mub = apply(b, 2, mean)
-        dm = try(mahalanobis(mua, mub, cov(a) + cov(b)))
+        mua <- apply(a, 2, mean)
+        mub <- apply(b, 2, mean)
+        dm <- try(mahalanobis(mua, mub, cov(a) + cov(b)))
         if (inherits(dm, what ='try-error')) NA
         else 1-3/sqrt(dm)
     }
