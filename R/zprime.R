@@ -18,7 +18,7 @@
 #' controls. 
 #' @param method A character vector, indicating which method should be used to
 #' compute the Z'-factor. Default is mahalanobis. See details.
-#' @value The z-prime value for the data in question.
+#' @return The z-prime value for the data in question.
 #' @references J. H. Zhang, T. D. Chung, K. R. Oldenburg. A Simple
 #' Statistical Parameter for Use in Evaluation and Validation of High
 #' Throughput Screening Assays. J Biomol Screening, 1999.

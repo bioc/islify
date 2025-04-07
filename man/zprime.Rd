@@ -16,6 +16,9 @@ controls.}
 \item{method}{A character vector, indicating which method should be used to
 compute the Z'-factor. Default is mahalanobis. See details.}
 }
+\value{
+The z-prime value for the data in question.
+}
 \description{
 This function is derived in its entirety from the deprecated imageHTS 
 package maintained by Gregoire Pau <gregoire.pau at embl.de>. 
