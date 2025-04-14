@@ -1,3 +1,6 @@
+Changes in versions 0.99.8-10
++ Small changes to bugs to various functions
+
 Changes in version 0.99.7
 + Major update, adding under-the-hood functionality in the islify function
 + The output of islify can now account for the area covered by nuclei. 

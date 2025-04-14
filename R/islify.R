@@ -217,9 +217,9 @@ islify <- function(imgDirs, imgNames, frameNumFocus,
         stop("imgDirs should either be a file or a list")
     } else if(identical(length(imgDirs), length(imgNames)) == FALSE){
         stop("The number of images and image names needs to be the same")
-    } else if(inherits(frameNumFocus, "numeric") == FALSE){
+    } else if(inherits(frameNumFocus, c("integer", "numeric")) == FALSE){
         stop("The frame number needs to be numeric")
-    } else if(inherits(sizeCutoff, "numeric") == FALSE){
+    } else if(inherits(sizeCutoff, c("integer", "numeric")) == FALSE){
         stop("The size cutoff needs to be numeric")
     } else if(inherits(threshold_method, "character") == FALSE){
         stop("The threshold method should be a character string")
