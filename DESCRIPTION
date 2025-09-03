@@ -1,7 +1,7 @@
 Package: islify
 Title: Automatic scoring and classification of cell-based assay images
-Version: 1.1.0
-Date: 2025-04-14
+Version: 1.1.1
+Date: 2025-09-03
 biocViews: Software,CellBasedAssays,BiomedicalInformatics,FeatureExtraction,
     Visualization,Pathways,Classification
 Authors@R: 

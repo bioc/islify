@@ -1,3 +1,6 @@
+Changes in version 1.1.1
++ Introduction of the problematicUnevenDistribution flag in the core islify function. 
+
 Changes in versions 0.99.8-10
 + Small changes to bugs to various functions
 

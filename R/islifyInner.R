@@ -3,6 +3,8 @@ islifyInner <- function(imgNum, imgDirs, frameNum,
                         diagnoImgs, truncTo, outDir, imgNames, numPix,
                         highNoise, intensityCutoff, 
                         intensityCutoffNuclei = FALSE,
+                        problematicUnevenDistribution =
+                          FALSE,
                         threshold_method,
                         ringFrac, flatFrac, truncLim = "max", numOfImgs,
                         reportIntensity, ignore_white,
@@ -76,8 +78,8 @@ islifyInner <- function(imgNum, imgDirs, frameNum,
     if (length(which(locFileClean != 0)) / length(locFileClean) > 0.9) {
         warning(
             "More than 90% of the pixels are positive with this threshold. ",
-            "This is unlikely to be correct even in a ",
-            "positive sample or control. "
+            "Consider if this is likely to be true or if it might ", 
+            "be artifactual."
         )
     }
     # Now, we are going to introduce an optional second filtering step, where
@@ -162,11 +164,9 @@ islifyInner <- function(imgNum, imgDirs, frameNum,
                 #for the whole picture. THis only applies if the picture is
                 #larger in one direction than 2000 pixels. 
                 
-                if(max(dim(locFileRaggedIsles)) > 2000){
-                    locFileBigIsles <- medianChunkFilter(locFileRaggedIsles, 
-                                                         locFile, 
-                                                         threshold_method, 
-                                                         ignore_white)
+                if(problematicUnevenDistribution && 
+                   min(dim(locFileRaggedIsles)) > 2000){
+                    locFileBigIsles <- medianChunkFilter(locFileRaggedIsles)
                 } else {
                     locFileBigIsles <- locFileRaggedIsles
                 }

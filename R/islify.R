@@ -61,6 +61,19 @@
 #' if present.
 #' @param intensityCutoffNuclei Same as above but for the nuclei frame,
 #' if present.
+#' @param problematicUnevenDistribution In some cases, such as for NMDA-R, 
+#' a recurrent problem is that regions on the borders of the well, or also
+#' more centrally, clumps of cells can form that artificially stain very 
+#' positively. To get rid of this effect, this flag can be set to true, in which
+#' case the image (if it is wider than 2000 pixels in both directions) is split
+#' into regions of at least 500 pixels in width and length. The number of 
+#' pixels identified as part of islands is thereafter calculated. 
+#' Regions with more than the average plus two standard deviations of island
+#' presence are thereafter excluded and any islands with presence therein are
+#' excluded. This might unintendedly have the consequence of excluding true,
+#' large islands in settings with general high intensity, as such a large 
+#' island might have a central region with increased intensity, so this flag
+#' should only be used in cases of very noisy data. 
 #' @param threshold_method The method used for thresholding. Available
 #' alternatives are the same as for the
 #' \code{\link[autothresholdr]{auto_thresh}} function. The default "Triangle"
@@ -187,6 +200,7 @@ islify <- function(imgDirs, imgNames, frameNumFocus,
                    intensityCutoffFocus = TRUE,
                    intensityCutoffReference = TRUE,
                    intensityCutoffNuclei = TRUE,
+                   problematicUnevenDistribution = FALSE,
                    threshold_method = "Triangle",
                    ignore_white = FALSE,
                    ringFrac = 0,
@@ -241,6 +255,7 @@ islify <- function(imgDirs, imgNames, frameNumFocus,
             highNoise = highNoise,
             intensityCutoff = intensityCutoffFocus,
             intensityCutoffNuclei = intensityCutoffNuclei,
+            problematicUnevenDistribution = problematicUnevenDistribution,
             threshold_method = threshold_method,
             ignore_white = ignore_white,
             ringFrac = ringFrac,
@@ -249,7 +264,7 @@ islify <- function(imgDirs, imgNames, frameNumFocus,
             numOfImgs = numOfImgs
         )))
         
-    } else if (inherits(frameNumReference, what = "numeric")) {
+    } else if (inherits(frameNumReference, what = c("numeric", "integer"))) {
         resDf <- as.data.frame(do.call("rbind", lapply(seq_along(imgDirs),
             islifyOuter,
             imgDirs = imgDirs,
@@ -267,6 +282,8 @@ islify <- function(imgDirs, imgNames, frameNumFocus,
             highNoise = highNoise,
             intensityCutoffFocus =
                 intensityCutoffFocus,
+            problematicUnevenDistribution = 
+              problematicUnevenDistribution,
             threshold_method = threshold_method,
             ignore_white = ignore_white,
             ringFrac = ringFrac,

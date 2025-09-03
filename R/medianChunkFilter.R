@@ -1,10 +1,12 @@
-medianChunkFilter <- function(locFileRaggedIsles, locFile, threshold_method,
-                              ignore_white){
-    origDims <- dim(locFile)
+#The point of this function is to exclude regions with much higher than
+#expected yields. We talk about "background" below, but that is a historic
+#remnant, from a time when it was the background that was calculated. 
+medianChunkFilter <- function(locFileRaggedIsles){
+    origDims <- dim(locFileRaggedIsles)
     
     #Now, which side is longer? 
-    fileRows <- nrow(locFile)
-    fileCols <- ncol(locFile)
+    fileRows <- nrow(locFileRaggedIsles)
+    fileCols <- ncol(locFileRaggedIsles)
     rowColRatio <- fileRows/fileCols
     
     if(rowColRatio < 1){
@@ -20,29 +22,25 @@ medianChunkFilter <- function(locFileRaggedIsles, locFile, threshold_method,
                         ceiling(seq(1, fileCols)/(fileCols/nChunksCol)))
     #Now, we calculate the background for each of the squares
     backgroundMat <- matrix(NA, nChunksRow, nChunksCol)
+    ragged01 <- as.matrix(locFileRaggedIsles)
+    ragged01[which(ragged01 != 0)] <- 1
     for(i in seq_along(rowNumList)){
         for(j in seq_along(colNumList)){
             rows <- rowNumList[[i]]
             cols <- colNumList[[j]]
-            backgroundMat[i,j] <- auto_thresh(locFile[rows,cols], 
-                                         method = "Triangle",
-                                         ignore_white = ignore_white)
+            backgroundMat[i,j] <- mean(ragged01[rows,cols])
         }
     }
-    #And here the background for all, as the individual backgrounds tend 
-    #to be variable and in some cases very low, dragging down the median
-    #to impractical levels. 
-    backgroundAll <- auto_thresh(locFile, 
-                                 method = "Triangle",
-                                 ignore_white = ignore_white)
-    backgroundMad <- mad(backgroundMat)
+  
+    backgroundAll <- mean(backgroundMat)
+    backgroundSd <- sd(backgroundMat)
     locFileDark <- locFileRaggedIsles
     for(i in seq_along(rowNumList)){
         for(j in seq_along(colNumList)){
             rows <- rowNumList[[i]]
             cols <- colNumList[[j]]
             locBackground <- backgroundMat[i,j]
-            if(locBackground > backgroundAll+(1*backgroundMad)){
+            if(locBackground > backgroundAll+(2*backgroundSd)){
                 locFileDark[rows,cols] <- 0
             }
         }
@@ -56,19 +54,25 @@ medianChunkFilter <- function(locFileRaggedIsles, locFile, threshold_method,
         missingIsles <- 
             names(bigIslesPixels)[-overlappingIsles]
         bigIslePixelsRed <- bigIslesPixels[overlappingIsles]
-        smallerIsles <- names(bigIslesPixels)[which(unlist(bigIslePixelsRed) > 
-                                                 unlist(darkIslesPixels))]
-        darkIsles <- c(missingIsles, smallerIsles)
+        if(any(unlist(bigIslePixelsRed) > 
+               unlist(darkIslesPixels))){
+          smallerIsles <- names(bigIslePixelsRed)[which(unlist(bigIslePixelsRed) > 
+                                                          unlist(darkIslesPixels))]
+          darkIsles <- c(missingIsles, smallerIsles)
+        } else {
+          darkIsles <- missingIsles
+        }
     } else {
         darkIsles <- names(bigIslesPixels)[which(unlist(bigIslesPixels) > 
                                               unlist(darkIslesPixels))]
     }
     
     if(length(darkIsles) > 0){
+      
         #Now,  we create the new, reduced file. 
-        sm <- as.data.frame(summary(locFileRaggedIsles))
+        sm <- as.data.frame(Matrix::summary(locFileRaggedIsles))
         colnames(sm) <- c("row", "column", "value")
-        sm$value[which(sm$value %in% as.numeric(names(darkIsles)))] <- 0
+        sm$value[which(sm$value %in% as.numeric(darkIsles))] <- 0
         # Here, we remove all new zeros.
         smSmall <- sm[which(sm$value > 0), ]
         locSM <- sparseMatrix(
